@@ -147,6 +147,10 @@ public class Main extends JFrame implements Runnable, KeyListener
         adcSonido2 = new Sonidos("monkey2.wav");
         
         addKeyListener(this);
+        // Declaras un hilo
+        Thread t = new Thread (this);
+	// Empieza el hilo
+	t.start ();
         
     }
     
