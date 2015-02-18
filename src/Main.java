@@ -17,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.URL;
 import java.util.LinkedList;
+import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -40,6 +41,7 @@ public class Main extends JFrame implements Runnable, KeyListener
     private LinkedList <Base> lklJuanillos;  //lista de juanillos
     private String nombreArchivo;    //Nombre del archivo.
     private String[] arr;    //Arreglo del archivo divido.
+    private Vector vec;    // Objeto vector para agregar el puntaje.
 
     
     /* objetos para manejar el buffer del Applet y este no parpadee */
@@ -51,6 +53,7 @@ public class Main extends JFrame implements Runnable, KeyListener
 
     public Main() {
         nombreArchivo = "Puntaje.txt";
+        vec = new Vector();
         iDireccion = 0;
         
         iSpeed = 3;
@@ -153,13 +156,22 @@ public class Main extends JFrame implements Runnable, KeyListener
 	t.start ();
         
     }
-    
-    
-    @Override
-    public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    	public void run () {
+            while (iVidas>0) {
+		actualiza();    //actualiza la posicion del raton.
+		checaColision();    //checa colision del elefante y raton ademas de con el JFrane.
+		repaint();    // Se actualiza el <code>JFrame</code> repintando el contenido.
+		try	{
+                // El thread se duerme.
+                        Thread.sleep (20);
+                }
+                    catch (InterruptedException ex)	{
+                        System.out.println("Error en " + ex.toString());
+                }
+        }
     }
-
+                        
+    
     @Override
     public void keyTyped(KeyEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
