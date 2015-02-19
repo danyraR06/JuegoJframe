@@ -45,9 +45,9 @@ public class Main extends JFrame implements Runnable, KeyListener
 
     
     /* objetos para manejar el buffer del Applet y este no parpadee */
-    private Image imaImagenApplet;   // Imagen a proyectar en Applet	
+    private Image dbImage;   // Imagen a proyectar en Applet	
     private Image imaOver;  
-    private Graphics graGraficaApplet;  // Objeto grafico de la Imagen
+    private Graphics dbg;	// Objeto grafico
     private Sonidos adcSonidoChimpy;   // Objeto sonido de Chimpy
     private Sonidos adcSonido2; //sonido cuanddo choca con juanillo
 
@@ -156,20 +156,154 @@ public class Main extends JFrame implements Runnable, KeyListener
 	t.start ();
         
     }
-    	public void run () {
-            while (iVidas>0) {
-		actualiza();    //actualiza la posicion del raton.
-		checaColision();    //checa colision del elefante y raton ademas de con el JFrane.
-		repaint();    // Se actualiza el <code>JFrame</code> repintando el contenido.
-		try	{
-                // El thread se duerme.
-                        Thread.sleep (20);
-                }
-                    catch (InterruptedException ex)	{
-                        System.out.println("Error en " + ex.toString());
-                }
+    public void run () {
+        while (iVidas>0) {
+            actualiza();    //actualiza la posicion del raton.
+            checaColision();    //checa colision del elefante y raton ademas de con el JFrane.
+            repaint();    // Se actualiza el <code>JFrame</code> repintando el contenido.
+            try	{
+            // El thread se duerme.
+                    Thread.sleep (20);
+            }
+                catch (InterruptedException ex)	{
+                    System.out.println("Error en " + ex.toString());
+            }
         }
     }
+    
+    public void actualiza(){
+        for (Base basFantasmita : lklFantasmas) {   //para cadafantasma
+           //establezco que solo se actualizará la posición de x para que avance de lado
+            basFantasmita.setX(basFantasmita.getX() + iGhostSpeed); 
+        }
+        for(Base basJuanillo : lklJuanillos) {
+            basJuanillo.setY(basJuanillo.getY() + iJuanillosSpeed);
+        }
+        
+        switch(iDireccion){  //en base a la direccion
+            case 1: {    //se mueve hacia arriba
+               basNena.setY(basNena.getY() -iSpeed);
+               break;
+            }
+            case 2: {    //se mueve hacia abajo
+                basNena.setY(basNena.getY() +iSpeed);
+                break;
+            }
+            case 3: {    //se mueve hacia la izquierda
+                basNena.setX(basNena.getX() -iSpeed);
+                break;
+            }
+            case 4: {    //se mueve hacia la derecha
+                basNena.setX(basNena.getX() +iSpeed);
+                break;
+            }
+        }
+        if(iContJuanillos == 5){
+            iContJuanillos = 0;
+            iVidas --;
+            iJuanillosSpeed ++;
+        }
+        if(iVidas == 0){
+            bolEnd = !bolEnd;
+        }
+    }
+    
+    public void checaColision(){
+        switch(iDireccion){
+            case 1: { // si se mueve hacia arriba 
+                if(basNena.getY() < 0) { // y esta pasando el limite
+                    iDireccion = 2;     // se cambia la direccion para abajo
+                }
+                break;    	
+            }     
+            case 2: { // si se mueve hacia abajo
+                // y se esta saliendo del applet
+                if(basNena.getY() + basNena.getAlto() > getHeight()) {
+                    iDireccion = 1;     // se cambia la direccion para arriba
+                }
+                break;    	
+            } 
+            case 3: { // si se mueve hacia izquierda 
+                if(basNena.getX() < 0) { // y se sale del applet
+                    iDireccion = 4;       // se cambia la direccion a la derecha
+                }
+                break;    	
+            }    
+            case 4: { // si se mueve hacia derecha 
+                // si se esta saliendo del applet
+                if(basNena.getX() + basNena.getAncho() > getWidth()) { 
+                    iDireccion = 3;       // se cambia direccion a la izquierda
+                }
+                break;    	
+            }			
+        }
+        for (Base basFantasmita : lklFantasmas) {   //para cada fantasma dentro de la lista
+            //checo la colision entre los fantasmas y susanita
+            
+             //para evitar que los fantasmitallas se salgan del applet de abajo
+            if(basFantasmita.getY() + basFantasmita.getAlto() > getHeight()){
+                basFantasmita.setY(this.getHeight() - basFantasmita.getAncho());
+            }
+            //para evitar que los fantasmillas se salgan de arriba
+            if(basFantasmita.getY() < 0){
+                basFantasmita.setY(0);
+            }
+            if (basNena.intersecta(basFantasmita)) {  //si se inersecta a susana con el fantasma
+                iScore ++;  //si hay colisión se resta 1 punto
+                adcSonidoChimpy.play();
+                basFantasmita.setX((int) Math.random() * getWidth()); //se reposiciona el fantasma en x = 0
+                basFantasmita.setY(-32); //se reposiciona afuera del applet
+            }
+            //si la imagen del fantasma llega a sobrepasar el ancho del applet
+            if(basFantasmita.getX() + basFantasmita.getAncho() > getWidth()) {
+                basFantasmita.setX(0); //la x se inicializa en 0
+                basFantasmita.setY((int) (Math.random() * getHeight()) -  //l
+                        basFantasmita.getAlto());
+            }
+        }
+        for (Base basJuanillo : lklJuanillos) {   //para cada fantasma dentro de la lista
+            //checo la colision entre los fantasmas y susanita
+            
+             //para evitar que los fJuanillos se salgan del applet de la derecha
+            if(basJuanillo.getX() + basJuanillo.getAncho() > getWidth()){
+                basJuanillo.setX(this.getWidth() - basJuanillo.getAlto());
+            }
+            //para evitar que los fantasmillas se salgan de la izquierda
+            if(basJuanillo.getX() < 0){
+                basJuanillo.setX(0);
+            }
+            if (basNena.intersecta(basJuanillo)) {  //si se inersecta a susana con el el juanete
+                adcSonido2.play();
+                iContJuanillos ++;
+                basJuanillo.setY((int) Math.random() * getWidth()); //se reposiciona el fantasma en x = 0
+                basJuanillo.setX(-32); //se reposiciona afuera del applet
+            }
+            //si la imagen del fantasma llega a sobrepasar el largo del applet
+            if(basJuanillo.getY() + basJuanillo.getAlto() > getHeight()) {
+                basJuanillo.setY(0); //la x se inicializa en 0
+                basJuanillo.setX((int) (Math.random() * getWidth()) -  //l
+                        basJuanillo.getAncho());
+            }
+        }
+    }
+    public void paint(Graphics g) {
+		// Inicializan el DoubleBuffer
+		if (dbImage == null) {
+			dbImage = createImage(this.getSize().width, this.getSize().height);
+			dbg = dbImage.getGraphics ();
+		}
+		// Actualiza la imagen de fondo.
+		dbg.setColor(getBackground ());
+		dbg.fillRect(0, 0, this.getSize().width, this.getSize().height);
+		// Actualiza el Foreground.
+		dbg.setColor(getForeground());
+		paint1(dbg);
+		// Dibuja la imagen actualizada
+		g.drawImage(dbImage, 0, 0, this);
+    }
+    
+    
+        
                         
     
     @Override
@@ -181,10 +315,22 @@ public class Main extends JFrame implements Runnable, KeyListener
     public void keyPressed(KeyEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public void keyReleased(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+     if (e.getKeyCode() == KeyEvent.VK_W) {    //Presiono flecha arriba
+            iDireccion = 1;
+        } else if (e.getKeyCode() == KeyEvent.VK_S) {    //Presiono flecha abajo
+	    iDireccion = 2;
+	} else if (e.getKeyCode() == KeyEvent.VK_A) {    //Presiono flecha izquierda
+	    iDireccion = 3;
+	} else if (e.getKeyCode() == KeyEvent.VK_D) {    //Presiono flecha derecha
+	    iDireccion = 4;
+        } else if(e.getKeyCode() == KeyEvent.VK_ESCAPE){  //si la boleana de esc falsa
+            bolEnd = !bolEnd;
+        } else if(e.getKeyCode() == KeyEvent.VK_P){  //si la boleana de pausa es falsa
+            bolPausa = !bolPausa;          
+        }
     }
     
 }
