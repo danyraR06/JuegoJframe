@@ -419,7 +419,7 @@ public class Main extends JFrame implements Runnable, KeyListener
             lklFantasmas.get(iI).setX(Integer.parseInt(arr[0]));
             lklFantasmas.get(iI).setY(Integer.parseInt(arr[1]));
         }
-        
+
          dato2 = fileIn.readLine();
         // Lee los juanitos
         for (int iI = 0; iI < (Integer.parseInt(dato2)); iI++) {
@@ -428,6 +428,13 @@ public class Main extends JFrame implements Runnable, KeyListener
             lklJuanillos.get(iI).setX(Integer.parseInt(arr[0]));
             lklJuanillos.get(iI).setY(Integer.parseInt(arr[1]));
         }
+        //velocidad juanillos
+        dato = fileIn.readLine();
+        iJuanillosSpeed = (Integer.parseInt(dato));
+        
+        //velocidad ghosts
+        dato = fileIn.readLine();
+        iGhostSpeed = (Integer.parseInt(dato));
         
         // Lee si esta pausado o no
         dato = fileIn.readLine();
@@ -472,6 +479,10 @@ public class Main extends JFrame implements Runnable, KeyListener
             fileOut.println(basJuanito.getX() + " " + basJuanito.getY());
         }
         
+        fileOut.println(iJuanillosSpeed);
+        
+        fileOut.println(iGhostSpeed);
+        
         // Guarda si está pausado o no
         fileOut.println(bolPausa);
         
@@ -510,6 +521,12 @@ public class Main extends JFrame implements Runnable, KeyListener
         } else if(e.getKeyCode() == KeyEvent.VK_G){
          try {
              grabaArchivo();
+         } catch (IOException ex) {
+             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+         }
+        }else if(e.getKeyCode() == KeyEvent.VK_C){
+         try {
+             leeArchivo();
          } catch (IOException ex) {
              Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
          }
