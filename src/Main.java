@@ -16,6 +16,13 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -172,6 +179,14 @@ public class Main extends JFrame implements Runnable, KeyListener
                     System.out.println("Error en " + ex.toString());
             }
         }
+        try{
+            leeArchivo();
+            vec.add(iVidas);
+            grabaArchivo();
+        }
+        catch (InterruptedException ex) {
+            System.out.println("Error en " + ex.toString());
+        }
     }
     
     public void actualiza(){
@@ -295,9 +310,10 @@ public class Main extends JFrame implements Runnable, KeyListener
 			dbImage = createImage(this.getSize().width, this.getSize().height);
 			dbg = dbImage.getGraphics ();
 		}
-		// Actualiza la imagen de fondo.
-		dbg.setColor(getBackground ());
-		dbg.fillRect(0, 0, this.getSize().width, this.getSize().height);
+                URL urlImagenFondo = this.getClass().getResource("Ciudad.png");
+                Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage(urlImagenFondo);
+                dbg.drawImage(imaImagenFondo, 0, 0, getWidth(), getHeight(), this);
+		
 		// Actualiza el Foreground.
 		dbg.setColor(getForeground());
 		paint1(dbg);
@@ -342,8 +358,36 @@ public class Main extends JFrame implements Runnable, KeyListener
     	score.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	score.setVisible(true);
     }
+    public void leeArchivo() throws IOException{
+    	BufferedReader fileIn;
+    	try{
+    		fileIn = new BufferedReader(new FileReader(nombreArchivo));
+    	} catch (FileNotFoundException e){
+    		File puntos = new File(nombreArchivo);
+    		PrintWriter fileOut = new PrintWriter(puntos);
+    		fileOut.println("100,demo");
+    		fileOut.close();
+    		fileIn = new BufferedReader(new FileReader(nombreArchivo));
+    	}
+    	String dato = fileIn.readLine();
+
+    	while(dato != null) {
+    		arr = dato.split(",");
+    		int num = (Integer.parseInt(arr[0]));
+    		String nom = arr[1];
+    		vec.add(iVidas);
+    		dato = fileIn.readLine();
+    	}
+    	fileIn.close();
+    }
     
-    
+     public void grabaArchivo() throws IOException{
+    	PrintWriter fileOut = new PrintWriter(new FileWriter(nombreArchivo));
+    	for (int i=0; i<vec.size(); i++) {
+            fileOut.println(iVidas);
+    	}
+    	fileOut.close();	
+    }
         
                         
     
