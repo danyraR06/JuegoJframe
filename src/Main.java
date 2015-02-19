@@ -110,7 +110,7 @@ public class Main extends JFrame implements Runnable, KeyListener
         
         //se crea una variable random para determinar la cantidad de fantasmas que se pueden
         //agregar al grupito o a la linkedlist
-        int iCantGhost = (int) (Math.random() * 3) + 8;
+        iCantGhost = (int) (Math.random() * 3) + 8;
         
         //se hace un ciclo para ir agregando los fantasmitas respetando el límite del grupo
         for (int iI = 0; iI < iCantGhost; iI ++) {
@@ -140,7 +140,7 @@ public class Main extends JFrame implements Runnable, KeyListener
         
         lklJuanillos = new LinkedList();
         
-        int iCantJuanillos = (int) (Math.random() * 5) + 10;
+        iCantJuanillos = (int) (Math.random() * 5) + 10;
         for (int iI = 0; iI < iCantJuanillos; iI ++) {
             //la posición de x será un número aleatorio con un int negativo para que el juanillo
             //entre desde fuera del applet
