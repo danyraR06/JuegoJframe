@@ -10,6 +10,7 @@
  */
 
 import java.applet.AudioClip;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -34,6 +35,8 @@ public class Main extends JFrame implements Runnable, KeyListener
     private int iContJuanillos; //contador de juanillos
     private boolean bolEnd;  //boleana de final
     private boolean bolPausa;  //boleana de pausa
+    private static final int WIDTH = 1000;    //Ancho del JFrame
+    private static final int HEIGHT = 600;    //Alto del JFrame
     private Base basNena;         // Objeto principal
     private Base basFantasmita;         // Objeto malo
     private Base basJuanillo; 
@@ -72,18 +75,18 @@ public class Main extends JFrame implements Runnable, KeyListener
 	URL urlImagenPrincipal = this.getClass().getResource("chimpy.gif");
                 
         // se crea el objeto para principal 
-	basNena = new Base(0, 0, getWidth() / iMAXANCHO,
-                getHeight() / iMAXALTO,
+	basNena = new Base(0, 0, WIDTH / iMAXANCHO,
+                HEIGHT / iMAXALTO,
                 Toolkit.getDefaultToolkit().getImage(urlImagenPrincipal));
 
         // se posiciona a principal  en la esquina superior izquierda del Applet 
-        basNena.setX(getWidth() / 2 - basNena.getAncho() / 2);
-        basNena.setY(getHeight() - basNena.getAlto());
+        basNena.setX(WIDTH / 2 - basNena.getAncho() / 2);
+        basNena.setY(HEIGHT - basNena.getAlto());
         
         
         // se crea el objeto para malo 
-        int iPosX = (iMAXANCHO - 1) * getWidth() / iMAXANCHO;
-        int iPosY = (iMAXALTO - 1) * getHeight() / iMAXALTO;        
+        int iPosX = (iMAXANCHO - 1) * WIDTH / iMAXANCHO;
+        int iPosY = (iMAXALTO - 1) * HEIGHT / iMAXALTO;        
 	
        
         //creo la lista de fantasmas
@@ -97,20 +100,20 @@ public class Main extends JFrame implements Runnable, KeyListener
         for (int iI = 0; iI < iAzar; iI ++) {
             //la posición de x será un número aleatorio con un int negativo para que el fantasma
             //entre desde fuera del applet
-            iPosY = -(int) (Math.random() * (getWidth() * 2));   
+            iPosY = -(int) (Math.random() * (WIDTH * 2));   
             //la posición de y será un número aleatorio 
-            iPosX = (int) (Math.random() * (getHeight() / 4));  
+            iPosX = (int) (Math.random() * (HEIGHT / 4));  
             
             //se crea el url de la imagen del fantasma
             URL urlImagenFantasmita = this.getClass().getResource("fantasmita.gif");
             // se crea el objeto fantasmita
-            basFantasmita = new Base(iPosX,iPosY, getWidth() / iMAXANCHO,
-                getHeight() / iMAXALTO,
+            basFantasmita = new Base(iPosX,iPosY, WIDTH / iMAXANCHO,
+                HEIGHT / iMAXALTO,
                 Toolkit.getDefaultToolkit().getImage(urlImagenFantasmita));
             
             //se genera un numero al azar dentro del rango del alto del applet menos el alto del fantasma
             //para que no se salga
-            int iAzarY = (int) (Math.random() * (getHeight() - basFantasmita.getAlto()));
+            int iAzarY = (int) (Math.random() * (HEIGHT - basFantasmita.getAlto()));
             
             //pongo el fantasma que acabo de crear en la posición al azar que se generó
             basFantasmita.setY(iAzarY);
@@ -125,20 +128,20 @@ public class Main extends JFrame implements Runnable, KeyListener
         for (int iI = 0; iI < iAzar2; iI ++) {
             //la posición de x será un número aleatorio con un int negativo para que el juanillo
             //entre desde fuera del applet
-            iPosX = (int) (Math.random() * (getWidth()));  
+            iPosX = (int) (Math.random() * (WIDTH));  
             //la posición de y será un número aleatorio 
             iPosY = (int) (0);   
             
             //se crea el url de la imagen del Juanillo
             URL urlImagenJuanillo = this.getClass().getResource("juanito.gif");
             // se crea el objeto fantasmita
-            basJuanillo = new Base(iPosX,iPosY, getWidth() / iMAXANCHO,
-                getHeight() / iMAXALTO,
+            basJuanillo = new Base(iPosX,iPosY, WIDTH / iMAXANCHO,
+                HEIGHT / iMAXALTO,
                 Toolkit.getDefaultToolkit().getImage(urlImagenJuanillo));
             
             //se genera un numero al azar dentro del rango del alto del applet menos el alto del fantasma
             //para que no se salga
-            int iAzarY2 = (int) (Math.random() * (getHeight() - basJuanillo.getAlto()));
+            int iAzarY2 = (int) (Math.random() * (HEIGHT - basJuanillo.getAlto()));
             
             //pongo el fantasma que acabo de crear en la posición al azar que se generó
             basJuanillo.setY(iAzarY2);
@@ -275,13 +278,13 @@ public class Main extends JFrame implements Runnable, KeyListener
             if (basNena.intersecta(basJuanillo)) {  //si se inersecta a susana con el el juanete
                 adcSonido2.play();
                 iContJuanillos ++;
-                basJuanillo.setY((int) Math.random() * getWidth()); //se reposiciona el fantasma en x = 0
+                basJuanillo.setY((int) Math.random() * WIDTH); //se reposiciona el fantasma en x = 0
                 basJuanillo.setX(-32); //se reposiciona afuera del applet
             }
             //si la imagen del fantasma llega a sobrepasar el largo del applet
             if(basJuanillo.getY() + basJuanillo.getAlto() > getHeight()) {
                 basJuanillo.setY(0); //la x se inicializa en 0
-                basJuanillo.setX((int) (Math.random() * getWidth()) -  //l
+                basJuanillo.setX((int) (Math.random() * HEIGHT) -  //l
                         basJuanillo.getAncho());
             }
         }
@@ -300,6 +303,44 @@ public class Main extends JFrame implements Runnable, KeyListener
 		paint1(dbg);
 		// Dibuja la imagen actualizada
 		g.drawImage(dbImage, 0, 0, this);
+    }
+    public void paint1(Graphics graDibujo) {
+        // si la imagen ya se cargo
+        if(!bolEnd){  //si el juego aun continúa
+            if (basNena != null && lklFantasmas != null && lklJuanillos != null) {
+                    graDibujo.fillRect(0, 0, WIDTH, HEIGHT);
+                    //Dibuja la imagen de principal en el Applet
+                    basNena.paint(graDibujo, this);
+                
+                    // pinto cada fantasma de la lista
+                    for (Base basFantasmitas : lklFantasmas) {
+                    //Dibuja la imagen de LOS fantasmitas en el Applet
+                        basFantasmitas.paint(graDibujo, this);
+                    }
+                    for (Base basJuanillo : lklJuanillos) {
+                    //Dibuja la imagen de LOS fantasmitas en el Applet
+                        basJuanillo.paint(graDibujo, this);
+                    }
+                    //Dibuja la imagen de malo en el Applet
+                    basJuanillo.paint(graDibujo, this);
+                    graDibujo.setColor(Color.red);  //se establece el color de la letra en rojo
+                    graDibujo.drawString("Vidas = " + iVidas, 15, 15);
+                    graDibujo.drawString("Puntos = " + iScore, 700,15);
+            } // sino se ha cargado se dibuja un mensaje 
+            else {
+                //Da un mensaje mientras se carga el dibujo	
+                graDibujo.drawString("No se cargo la imagen..", 20, 20);
+            }
+        }else {
+                graDibujo.drawImage(imaOver,150,0,this); 
+            }  
+    }
+    public static void main(String[] args) {
+    	// TODO code application logic here
+    	Main score = new Main();
+    	score.setSize(WIDTH, HEIGHT);
+    	score.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    	score.setVisible(true);
     }
     
     
