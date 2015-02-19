@@ -38,6 +38,7 @@ public class Main extends JFrame implements Runnable, KeyListener
     private int iSpeed;  //velocidad de la nena
     private int iVidas; //vidas del juego
     private int iScore; //contador de puntos
+    private int iCont;
     private int iGhostSpeed;  //velocidad de los fantasmas
     private int iJuanillosSpeed; //velocidad de los juanillos
     private int iContJuanillos; //contador de juanillos
@@ -72,6 +73,8 @@ public class Main extends JFrame implements Runnable, KeyListener
         iVidas = (int) (Math.random() * 2) + 3;
         
         iScore = 0;
+        
+        iCont = 0;
         
         bolPausa = false;
              
@@ -170,7 +173,7 @@ public class Main extends JFrame implements Runnable, KeyListener
         
     }
     public void run () {
-        while (iVidas>0) {
+        while (!bolEnd) {
             if(!bolPausa)
             {
                 actualiza();    //actualiza la posicion del raton.
@@ -188,12 +191,36 @@ public class Main extends JFrame implements Runnable, KeyListener
     }
     
     public void actualiza(){
-        for (Base basFantasmita : lklFantasmas) {   //para cadafantasma
-           //establezco que solo se actualizará la posición de x para que avance de lado
-            basFantasmita.setX(basFantasmita.getX() + iGhostSpeed); 
+                for (Base basJuanillo : lklJuanillos) {
+            //actualizo al 2 dependiendo de donde anda el1
+            if(basJuanillo.getY() + basJuanillo.getAlto() > getHeight())
+            {
+                int iPosX = (int) (Math.random() * (getWidth() 
+                        - basJuanillo.getAncho()));    
+                int iPosY = (int) (Math.random() * (-(getHeight())));
+                basJuanillo.setX(iPosX);
+                basJuanillo.setY(iPosY);
+            }
+            else
+            {
+               basJuanillo.setY(basJuanillo.getY() + iJuanillosSpeed); 
+            }
         }
-        for(Base basJuanillo : lklJuanillos) {
-            basJuanillo.setY(basJuanillo.getY() + iJuanillosSpeed);
+        
+        //se actualiza posiciones de los fantasmas
+        for (Base basFantasma : lklFantasmas) {
+            //actualizo al 2 dependiendo de donde anda el1
+            if(basFantasma.getX() + basFantasma.getAncho() > getWidth())
+            {
+                int iPosX = (int) (Math.random() * (-(getWidth())));    
+                int iPosY = (int) (Math.random() * (getHeight() - basFantasma.getAlto()));
+                basFantasma.setX(iPosX);
+                basFantasma.setY(iPosY);
+            }
+            else
+            {
+               basFantasma.setX(basFantasma.getX() + iGhostSpeed); 
+            }
         }
         
         switch(iDireccion){  //en base a la direccion
@@ -214,13 +241,8 @@ public class Main extends JFrame implements Runnable, KeyListener
                 break;
             }
         }
-        if(iContJuanillos == 5){
-            iContJuanillos = 0;
-            iVidas --;
-            iJuanillosSpeed ++;
-        }
         if(iVidas == 0){
-            bolEnd = !bolEnd;
+            bolEnd = true;
         }
     }
     
@@ -228,79 +250,62 @@ public class Main extends JFrame implements Runnable, KeyListener
         switch(iDireccion){
             case 1: { // si se mueve hacia arriba 
                 if(basNena.getY() < 0) { // y esta pasando el limite
-                    iDireccion = 2;     // se cambia la direccion para abajo
+                    iDireccion = 0;     // se para
                 }
                 break;    	
             }     
             case 2: { // si se mueve hacia abajo
                 // y se esta saliendo del applet
                 if(basNena.getY() + basNena.getAlto() > getHeight()) {
-                    iDireccion = 1;     // se cambia la direccion para arriba
+                    iDireccion = 0;     // se para
                 }
                 break;    	
             } 
             case 3: { // si se mueve hacia izquierda 
                 if(basNena.getX() < 0) { // y se sale del applet
-                    iDireccion = 4;       // se cambia la direccion a la derecha
+                    iDireccion = 0;       // se para
                 }
                 break;    	
             }    
             case 4: { // si se mueve hacia derecha 
                 // si se esta saliendo del applet
                 if(basNena.getX() + basNena.getAncho() > getWidth()) { 
-                    iDireccion = 3;       // se cambia direccion a la izquierda
+                    iDireccion = 0;       // se para
                 }
                 break;    	
             }			
         }
-        for (Base basFantasmita : lklFantasmas) {   //para cada fantasma dentro de la lista
-            //checo la colision entre los fantasmas y susanita
+        for (Base basJuanillo : lklJuanillos) {
             
-             //para evitar que los fantasmitallas se salgan del applet de abajo
-            if(basFantasmita.getY() + basFantasmita.getAlto() > getHeight()){
-                basFantasmita.setY(this.getHeight() - basFantasmita.getAncho());
-            }
-            //para evitar que los fantasmillas se salgan de arriba
-            if(basFantasmita.getY() < 0){
-                basFantasmita.setY(0);
-            }
-            if (basNena.intersecta(basFantasmita)) {  //si se inersecta a susana con el fantasma
-                iScore ++;  //si hay colisión se resta 1 punto
+            //checo la colision entre nena y juanitos
+            if (basNena.intersecta(basJuanillo)) {
+                int iPosX = (int) (Math.random() * (getWidth() - basJuanillo.getAncho()));    
+                int iPosY = (int) (Math.random() * (-(getHeight())));
+                basJuanillo.setX(iPosX);
+                basJuanillo.setY(iPosY);
+                iCont++;
                 adcSonidoChimpy.play();
-                basFantasmita.setX((int) Math.random() * getWidth()); //se reposiciona el fantasma en x = 0
-                basFantasmita.setY(-32); //se reposiciona afuera del applet
-            }
-            //si la imagen del fantasma llega a sobrepasar el ancho del applet
-            if(basFantasmita.getX() + basFantasmita.getAncho() > getWidth()) {
-                basFantasmita.setX(0); //la x se inicializa en 0
-                basFantasmita.setY((int) (Math.random() * getHeight()) -  //l
-                        basFantasmita.getAlto());
+                if(iCont==5)
+                {
+                    iVidas--;
+                    iJuanillosSpeed++;
+                    iCont=0;
+                }
             }
         }
-        for (Base basJuanillo : lklJuanillos) {   //para cada fantasma dentro de la lista
-            //checo la colision entre los fantasmas y susanita
-            
-             //para evitar que los fJuanillos se salgan del applet de la derecha
-            if(basJuanillo.getX() + basJuanillo.getAncho() > getWidth()){
-                basJuanillo.setX(this.getWidth() - basJuanillo.getAlto());
-            }
-            //para evitar que los fantasmillas se salgan de la izquierda
-            if(basJuanillo.getX() < 0){
-                basJuanillo.setX(0);
-            }
-            if (basNena.intersecta(basJuanillo)) {  //si se inersecta a susana con el el juanete
+        
+        for (Base basFantasma : lklFantasmas) {
+            //checo la colision entre nena y fantasmas
+            if (basNena.intersecta(basFantasma)) {
+                int iPosX = (int) (Math.random() * (-(getWidth())));    
+                int iPosY = (int) (Math.random() * (getHeight() - basFantasma.getAlto()));
+                basFantasma.setX(iPosX);
+                basFantasma.setY(iPosY);
+                iScore++;
                 adcSonido2.play();
-                iContJuanillos ++;
-                basJuanillo.setY((int) Math.random() * WIDTH); //se reposiciona el fantasma en x = 0
-                basJuanillo.setX(-32); //se reposiciona afuera del applet
-            }
-            //si la imagen del fantasma llega a sobrepasar el largo del applet
-            if(basJuanillo.getY() + basJuanillo.getAlto() > getHeight()) {
-                basJuanillo.setY(0); //la x se inicializa en 0
-                basJuanillo.setX((int) (Math.random() * HEIGHT) -  //l
-                        basJuanillo.getAncho());
             }
         }
+
     }
     public void paint(Graphics g) {
 		// Inicializan el DoubleBuffer
