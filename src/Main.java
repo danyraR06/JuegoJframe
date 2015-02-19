@@ -27,6 +27,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -41,7 +43,8 @@ public class Main extends JFrame implements Runnable, KeyListener
     private int iCont;
     private int iGhostSpeed;  //velocidad de los fantasmas
     private int iJuanillosSpeed; //velocidad de los juanillos
-    private int iContJuanillos; //contador de juanillos
+    private int iCantJuanillos; //contador de juanillos
+    private int iCantGhost;
     private boolean bolEnd;  //boleana de final
     private boolean bolPausa;  //boleana de pausa
     private static final int WIDTH = 1000;    //Ancho del JFrame
@@ -107,10 +110,10 @@ public class Main extends JFrame implements Runnable, KeyListener
         
         //se crea una variable random para determinar la cantidad de fantasmas que se pueden
         //agregar al grupito o a la linkedlist
-        int iAzar = (int) (Math.random() * 2) + 8;
+        int iCantGhost = (int) (Math.random() * 3) + 8;
         
         //se hace un ciclo para ir agregando los fantasmitas respetando el límite del grupo
-        for (int iI = 0; iI < iAzar; iI ++) {
+        for (int iI = 0; iI < iCantGhost; iI ++) {
             //la posición de x será un número aleatorio con un int negativo para que el fantasma
             //entre desde fuera del applet
             iPosY = -(int) (Math.random() * (WIDTH * 2));   
@@ -137,8 +140,8 @@ public class Main extends JFrame implements Runnable, KeyListener
         
         lklJuanillos = new LinkedList();
         
-        int iAzar2 = (int) (Math.random() * 5) + 10;
-        for (int iI = 0; iI < iAzar2; iI ++) {
+        int iCantJuanillos = (int) (Math.random() * 5) + 10;
+        for (int iI = 0; iI < iCantJuanillos; iI ++) {
             //la posición de x será un número aleatorio con un int negativo para que el juanillo
             //entre desde fuera del applet
             iPosX = (int) (Math.random() * (WIDTH));  
@@ -188,7 +191,13 @@ public class Main extends JFrame implements Runnable, KeyListener
                     System.out.println("Error en " + ex.toString());
             }
         }
-        
+        try{
+            leeArchivo();    //lee el contenido del archivo
+            vec.add(iVidas);    //Agrega el contenido del nuevo puntaje al vector.
+            grabaArchivo();    //Graba el vector en el archivo.
+        }catch(IOException e){
+            System.out.println("Error en " + e.toString());
+        }
         
     }
     
@@ -365,8 +374,9 @@ public class Main extends JFrame implements Runnable, KeyListener
     	score.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	score.setVisible(true);
     }
-    public void leeArchivo() throws IOException{
-    	BufferedReader fileIn;
+    
+    private void leeArchivo() throws IOException{
+        BufferedReader fileIn;
     	try{
     		fileIn = new BufferedReader(new FileReader(nombreArchivo));
     	} catch (FileNotFoundException e){
@@ -376,24 +386,96 @@ public class Main extends JFrame implements Runnable, KeyListener
     		fileOut.close();
     		fileIn = new BufferedReader(new FileReader(nombreArchivo));
     	}
+        
     	String dato = fileIn.readLine();
 
-    	while(dato != null) {
-    		arr = dato.split(",");
-    		int num = (Integer.parseInt(arr[0]));
-    		String nom = arr[1];
-    		vec.add(iVidas);
-    		dato = fileIn.readLine();
-    	}
+        // Lee la cantidad de vidas
+        iVidas = (Integer.parseInt(dato));
+        
+        dato = fileIn.readLine();
+        
+        // Lee el score
+        iScore = (Integer.parseInt(dato));
+        
+        // Lee la direccion
+        dato = fileIn.readLine();
+        iDireccion = (Integer.parseInt(dato));
+ 
+        // Lee a Nena
+        dato = fileIn.readLine();
+        
+        arr = dato.split(" ");
+        basNena.setX(Integer.parseInt(arr[0]));
+        basNena.setY(Integer.parseInt(arr[1]));
+        
+        String dato2 = new String();
+        dato2 = fileIn.readLine();
+        
+        
+        // Lee los fantasmas
+        for (int iI = 0; iI < (Integer.parseInt(dato2)); iI++) {
+            dato = fileIn.readLine();
+            arr = dato.split(" ");
+            lklFantasmas.get(iI).setX(Integer.parseInt(arr[0]));
+            lklFantasmas.get(iI).setY(Integer.parseInt(arr[1]));
+        }
+        
+         dato2 = fileIn.readLine();
+        // Lee los juanitos
+        for (int iI = 0; iI < (Integer.parseInt(dato2)); iI++) {
+            dato = fileIn.readLine();
+            arr = dato.split(" ");
+            lklJuanillos.get(iI).setX(Integer.parseInt(arr[0]));
+            lklJuanillos.get(iI).setY(Integer.parseInt(arr[1]));
+        }
+        
+        // Lee si esta pausado o no
+        dato = fileIn.readLine();
+        bolPausa = (Boolean.parseBoolean(dato));
+        
+    
     	fileIn.close();
     }
-    
-     public void grabaArchivo() throws IOException{
-    	PrintWriter fileOut = new PrintWriter(new FileWriter(nombreArchivo));
-    	for (int i=0; i<vec.size(); i++) {
-            fileOut.println(iVidas);
-    	}
-    	fileOut.close();	
+    /**
+     * Metodo graba información en un archivo.
+     *
+     * @throws IOException
+     */
+    private void grabaArchivo() throws IOException {
+        PrintWriter fileOut = new PrintWriter(new FileWriter(nombreArchivo));
+        
+        // Guarda cantidad de vidas
+        fileOut.println(iVidas);
+        
+        // Guarda el score
+        fileOut.println(iScore);
+        
+        // Guarda la dirección
+        fileOut.println(iDireccion);
+        
+        // Guarda a Nena
+        fileOut.println(basNena.getX() + " " + basNena.getY());
+        
+        // Guarda la cantidad de Fantasmas
+        fileOut.println(iCantGhost);
+        
+        // Guarda cada Fantasma
+        for (Base basFantasma : lklFantasmas) {
+            fileOut.println(basFantasma.getX() + " " + basFantasma.getY());
+        }
+        
+        // Guarda la cantidad de Juanitos
+        fileOut.println(iCantJuanillos);
+        
+        // Guarda cada Juanito
+        for (Base basJuanito : lklJuanillos) {
+            fileOut.println(basJuanito.getX() + " " + basJuanito.getY());
+        }
+        
+        // Guarda si está pausado o no
+        fileOut.println(bolPausa);
+        
+    	fileOut.close();	        
     }
         
                         
@@ -425,6 +507,12 @@ public class Main extends JFrame implements Runnable, KeyListener
                 bolPausa = false;
             else
                 bolPausa = true;         
+        } else if(e.getKeyCode() == KeyEvent.VK_G){
+         try {
+             grabaArchivo();
+         } catch (IOException ex) {
+             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+         }
         }
     }
     
