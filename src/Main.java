@@ -185,6 +185,8 @@ public class Main extends JFrame implements Runnable, KeyListener
                     System.out.println("Error en " + ex.toString());
             }
         }
+        
+        
     }
     
     public void actualiza(){
