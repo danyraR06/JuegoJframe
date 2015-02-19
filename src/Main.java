@@ -11,6 +11,7 @@
 
 import java.applet.AudioClip;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -71,6 +72,8 @@ public class Main extends JFrame implements Runnable, KeyListener
         iVidas = (int) (Math.random() * 2) + 3;
         
         iScore = 0;
+        
+        bolPausa = false;
              
         iGhostSpeed = (int) (Math.random() * 2) + 3;
         
@@ -168,9 +171,12 @@ public class Main extends JFrame implements Runnable, KeyListener
     }
     public void run () {
         while (iVidas>0) {
-            actualiza();    //actualiza la posicion del raton.
-            checaColision();    //checa colision del elefante y raton ademas de con el JFrane.
-            repaint();    // Se actualiza el <code>JFrame</code> repintando el contenido.
+            if(!bolPausa)
+            {
+                actualiza();    //actualiza la posicion del raton.
+                checaColision();    //checa colision del elefante y raton ademas de con el JFrane.
+                repaint();    // Se actualiza el <code>JFrame</code> repintando el contenido. 
+            }
             try	{
             // El thread se duerme.
                     Thread.sleep (20);
@@ -178,14 +184,6 @@ public class Main extends JFrame implements Runnable, KeyListener
                 catch (InterruptedException ex)	{
                     System.out.println("Error en " + ex.toString());
             }
-        }
-        try{
-            leeArchivo();
-            vec.add(iVidas);
-            grabaArchivo();
-        }
-        catch (InterruptedException ex) {
-            System.out.println("Error en " + ex.toString());
         }
     }
     
@@ -324,7 +322,6 @@ public class Main extends JFrame implements Runnable, KeyListener
         // si la imagen ya se cargo
         if(!bolEnd){  //si el juego aun continúa
             if (basNena != null && lklFantasmas != null && lklJuanillos != null) {
-                    graDibujo.fillRect(0, 0, WIDTH, HEIGHT);
                     //Dibuja la imagen de principal en el Applet
                     basNena.paint(graDibujo, this);
                 
@@ -338,10 +335,13 @@ public class Main extends JFrame implements Runnable, KeyListener
                         basJuanillo.paint(graDibujo, this);
                     }
                     //Dibuja la imagen de malo en el Applet
+                    graDibujo.setColor(Color.red);
+                    Font fontF = new Font("Serif", Font.BOLD, 30);
+                    graDibujo.setFont(fontF);
                     basJuanillo.paint(graDibujo, this);
                     graDibujo.setColor(Color.red);  //se establece el color de la letra en rojo
-                    graDibujo.drawString("Vidas = " + iVidas, 15, 15);
-                    graDibujo.drawString("Puntos = " + iScore, 700,15);
+                    graDibujo.drawString("Vidas = " + iVidas, 40, 70);
+                    graDibujo.drawString("Puntos = " + iScore, 40,100);
             } // sino se ha cargado se dibuja un mensaje 
             else {
                 //Da un mensaje mientras se carga el dibujo	
@@ -414,7 +414,10 @@ public class Main extends JFrame implements Runnable, KeyListener
         } else if(e.getKeyCode() == KeyEvent.VK_ESCAPE){  //si la boleana de esc falsa
             bolEnd = !bolEnd;
         } else if(e.getKeyCode() == KeyEvent.VK_P){  //si la boleana de pausa es falsa
-            bolPausa = !bolPausa;          
+            if (bolPausa)
+                bolPausa = false;
+            else
+                bolPausa = true;         
         }
     }
     
