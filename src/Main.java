@@ -6,7 +6,10 @@
 
 /**
  *
- * @author danyrmz
+ * @author Dany Ramírez y Juan ordaz
+ * Matrícula: A01139581 y A01191576
+ * Fecha: 18/02/2015
+ * Version 1.0
  */
 
 import java.applet.AudioClip;
